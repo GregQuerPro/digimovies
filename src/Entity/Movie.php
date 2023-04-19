@@ -20,13 +20,12 @@ class Movie
     #[Groups(["movie_list", "movie_details"])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(["movie_details"])]
-    private ?string $author = null;
-
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(["movie_details"])]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'movies')]
+    private ?Author $author = null;
 
     public function getId(): ?int
     {
@@ -45,18 +44,6 @@ class Movie
         return $this;
     }
 
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(string $author): self
-    {
-        $this->author = $author;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -65,6 +52,18 @@ class Movie
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?Author
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?Author $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }
