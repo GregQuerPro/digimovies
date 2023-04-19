@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Author;
 use App\Entity\Movie;
 use App\Repository\MovieRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,10 +45,18 @@ class MoviesController extends AbstractController
     #[Route('api/movies/add', name: 'movie_add', methods: "POST")]
     public function post(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $movie = $this->serializer->deserialize($request->getContent(), Movie::class, 'json');
+        $data = json_decode($request->getContent(), true);
+        $author = $em->getRepository(Author::class)->find($data['author']['id']);
+        if (!$author) {
+            throw $this->createNotFoundException('Auteur non trouvé pour l\'ID ' . $data['author']['id']);
+        }
+        $movie = new Movie();
+        $movie->setName($data['name']);
+        $movie->setDescription($data['description']);
+        $movie->setAuthor($author);
         $em->persist($movie);
         $em->flush();
-        return $this->json($movie);
+        return $this->json('success');
     }
 
     #[Route('api/movies/delete/{id}', name: 'movie_delete', methods: "DELETE")]
